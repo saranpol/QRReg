@@ -7,6 +7,9 @@
 //
 
 #import "QRRViewController.h"
+#import "ViewCamera.h"
+#import "ViewType.h"
+#import "API.h"
 
 @interface QRRViewController ()
 
@@ -14,12 +17,23 @@
 
 @implementation QRRViewController
 
-@synthesize mLabelTest;
+@synthesize mViewCamera;
+@synthesize mViewType;
+@synthesize mReader;
+@synthesize mLabelName;
+@synthesize mLabelPosition;
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+    self.view.hidden = YES;
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    if(self.view.hidden == YES)
+        [self clickCamera:nil];
 }
 
 - (void)didReceiveMemoryWarning
@@ -29,25 +43,101 @@
 }
 
 - (IBAction)clickCamera:(id)sender {
-    // ADD: present a barcode reader that scans from the camera feed
-    ZBarReaderViewController *reader = [ZBarReaderViewController new];
-    reader.readerDelegate = self;
-    reader.supportedOrientationsMask = ZBarOrientationMaskAll;
+    if(!mViewCamera){
+        self.mViewCamera = [[ViewCamera alloc] initWithNibName:@"ViewCamera" bundle:nil];
+        self.mViewCamera.mParent = self;
+    }
+
+    if(!mReader){
+        self.mReader = [ZBarReaderViewController new];
+        mReader.readerDelegate = self;
+        mReader.supportedOrientationsMask = ZBarOrientationMaskAll;
     
-    ZBarImageScanner *scanner = reader.scanner;
-    // TODO: (optional) additional reader configuration here
+        ZBarImageScanner *scanner = mReader.scanner;
+        // TODO: (optional) additional reader configuration here
     
-    // EXAMPLE: disable rarely used I2/5 to improve performance
-    [scanner setSymbology: ZBAR_I25
-                   config: ZBAR_CFG_ENABLE
-                       to: 0];
+        // EXAMPLE: disable rarely used I2/5 to improve performance
+        [scanner setSymbology: ZBAR_I25
+                       config: ZBAR_CFG_ENABLE
+                           to: 0];
+        mReader.showsCameraControls = NO;  // for UIImagePickerController
+        mReader.showsZBarControls = NO;
+        mReader.cameraOverlayView = mViewCamera.view;
+
+    }
+
+    
     
     // present and release the controller
-    [self presentViewController:reader animated:YES completion:nil];
+    [self presentViewController:mReader animated:NO completion:^{
+        self.view.hidden = NO;
+    }];
+}
+
+- (IBAction)clickType:(id)sender {
+    if(!mViewType){
+        self.mViewType = [[ViewType alloc] initWithNibName:@"ViewType" bundle:nil];
+        self.mViewType.mParent = self;
+    }
+    
+    mViewType.mTextField.text = nil;
+    [self presentViewController:mViewType animated:NO completion:^{
+    }];
+    
+}
+
+- (void)showError {
+    [mLabelName setText:@"มีข้อผิดพลาด"];
+    [mLabelPosition setText:@"กรุณาลองใหม่อีกครั้ง"];
+    
+}
+
+- (void)sendCode:(NSString*)code {
+    API *a = [API getAPI];
+    [mLabelName setText:@"LOADING"];
+    [mLabelPosition setText:@"Please wait"];
+
+    [a api_send:code success:^(id JSON){
+        NSDictionary *json = (NSDictionary*)JSON;
+        
+        if(json){
+            //NSLog(@"xxx %@",json);
+            NSString *show_name;
+            NSString *th_name = [json objectForKey:@"TH_NAME"];
+            if(th_name && [th_name length] > 0) {
+                show_name = [NSString stringWithFormat:@"#%@", th_name];
+                show_name = [show_name stringByReplacingOccurrencesOfString:@"#นาย " withString:@"คุณ "];
+                show_name = [show_name stringByReplacingOccurrencesOfString:@"#นาง " withString:@"คุณ "];
+                show_name = [show_name stringByReplacingOccurrencesOfString:@"#น.ส. " withString:@"คุณ "];
+            }else{
+                NSString *a = [json objectForKey:@"TITLE"];
+                NSString *b = [json objectForKey:@"FIRSTNAME"];
+                NSString *c = [json objectForKey:@"LASTNAME"];
+                if(!a) a = @"";
+                if(!b) b = @"";
+                if(!c) c = @"";
+                show_name = [NSString stringWithFormat:@"%@%@ %@", a, b, c];
+            }
+            
+            NSString *pos_text = [json objectForKey:@"POS_TEXT"];
+            if(!pos_text)
+                pos_text = @"-";
+            
+            [mLabelName setText:show_name];
+            [mLabelPosition setText:pos_text];
+        }else{
+            [self showError];
+        }
+        [self performSelector:@selector(clickCamera:) withObject:nil afterDelay:3.0];
+    }failure:^(NSError* failure) {
+        [self showError];
+        [self performSelector:@selector(clickCamera:) withObject:nil afterDelay:3.0];
+    }];
+    
 }
 
 
-- (void) imagePickerController:(UIImagePickerController*)reader didFinishPickingMediaWithInfo:(NSDictionary*)info {
+- (void)imagePickerController:(UIImagePickerController*)reader didFinishPickingMediaWithInfo:(NSDictionary*)info {
     // ADD: get the decode results
     id<NSFastEnumeration> results =
     [info objectForKey: ZBarReaderControllerResults];
@@ -57,13 +147,17 @@
         break;
     
     // EXAMPLE: do something useful with the barcode data
-    mLabelTest.text = symbol.data;
+    //mLabelTest.text = symbol.data;
     
     // EXAMPLE: do something useful with the barcode image
 //    resultImage.image = [info objectForKey: UIImagePickerControllerOriginalImage];
     
     // ADD: dismiss the controller (NB dismiss from the *reader*!)
-    [reader dismissViewControllerAnimated:YES completion:nil];
+    [self sendCode:symbol.data];
+    [reader dismissViewControllerAnimated:YES completion:^{
+    }];
+    
+    
 }
 
 @end
