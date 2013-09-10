@@ -26,6 +26,7 @@ typedef void (^APIFail)(NSError*);
 
 // Persistence
 - (id)getObject:(NSString*)key;
+- (void)saveObject:(id)obj forKey:(NSString*)key;
 
 // API_ONLINE
 - (void)api_send:(NSString*)code

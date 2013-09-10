@@ -9,7 +9,9 @@
 #import "QRRViewController.h"
 #import "ViewCamera.h"
 #import "ViewType.h"
+#import "ViewSetting.h"
 #import "API.h"
+#import <AudioToolbox/AudioToolbox.h>
 
 @interface QRRViewController ()
 
@@ -19,6 +21,7 @@
 
 @synthesize mViewCamera;
 @synthesize mViewType;
+@synthesize mViewSetting;
 @synthesize mReader;
 @synthesize mLabelName;
 @synthesize mLabelPosition;
@@ -28,6 +31,9 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     self.view.hidden = YES;
+    
+    [mLabelName setFont:[UIFont fontWithName:@"PSLxKittithada-Bold" size:mLabelName.font.pointSize]];
+    [mLabelPosition setFont:[UIFont fontWithName:@"PSLxKittithada-Bold" size:mLabelPosition.font.pointSize]];    
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -86,10 +92,22 @@
     
 }
 
+- (IBAction)clickSetting:(id)sender {
+    if(!mViewSetting){
+        self.mViewSetting = [[ViewSetting alloc] initWithNibName:@"ViewSetting" bundle:nil];
+        self.mViewSetting.mParent = self;
+    }
+    
+    [self presentViewController:mViewSetting animated:NO completion:^{
+    }];
+    
+}
+
+
 - (void)showError {
     [mLabelName setText:@"มีข้อผิดพลาด"];
     [mLabelPosition setText:@"กรุณาลองใหม่อีกครั้ง"];
-    
+    AudioServicesPlaySystemSound(1022);
 }
 
 - (void)sendCode:(NSString*)code {
@@ -125,6 +143,7 @@
             
             [mLabelName setText:show_name];
             [mLabelPosition setText:pos_text];
+            AudioServicesPlaySystemSound(1000);
         }else{
             [self showError];
         }

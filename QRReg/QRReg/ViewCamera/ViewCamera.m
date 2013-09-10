@@ -43,5 +43,11 @@
         [mParent clickType:nil];
     }];
 }
+- (IBAction)clickLogo:(id)sender {
+    [mParent.mReader dismissViewControllerAnimated:NO completion:^{
+        [mParent clickSetting:nil];
+    }];
+    
+}
 
 @end

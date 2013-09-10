@@ -50,6 +50,9 @@ static API *instance;
 //    [mClientInfoDict setObject:[NSString stringWithFormat:@"%d", mWidth] forKey:@"w"];
 //    [mClientInfoDict setObject:[NSString stringWithFormat:@"%d", mHeight] forKey:@"h"];
     
+    NSString *host = [self getObject:@"HOST"];
+    if(host)
+        [[APIClientHttp sharedClient] setBaseURL:[NSURL URLWithString:host]];
     
     return a;
 }

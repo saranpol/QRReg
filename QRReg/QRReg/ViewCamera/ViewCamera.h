@@ -15,5 +15,6 @@
 @property (nonatomic, assign) QRRViewController *mParent;
 
 - (IBAction)clickType:(id)sender;
+- (IBAction)clickLogo:(id)sender;
 
 @end

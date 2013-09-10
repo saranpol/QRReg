@@ -37,6 +37,8 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    
+    [mTextField setFont:[UIFont fontWithName:@"PSLxKittithada-Bold" size:mTextField.font.pointSize]];
 }
 
 - (void)didReceiveMemoryWarning

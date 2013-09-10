@@ -17,7 +17,7 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="89" id="g8u-LR-mLW"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="40"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="60"/>
                                 <color key="textColor" red="0.44690564274787903" green="0.68982309103012085" blue="0.1042814701795578" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -25,7 +25,7 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="72" id="tuu-2E-AgD"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="45"/>
                                 <color key="textColor" red="0.44690564269999999" green="0.68982309100000005" blue="0.1042814702" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
