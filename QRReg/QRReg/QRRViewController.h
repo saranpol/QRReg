@@ -8,6 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
-@interface QRRViewController : UIViewController
+#import "ZBarSDK.h"
+
+@interface QRRViewController : UIViewController <ZBarReaderDelegate>
+
+@property (nonatomic, weak) IBOutlet UILabel *mLabelTest;
+
+- (IBAction)clickCamera:(id)sender;
 
 @end
