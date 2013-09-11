@@ -69,7 +69,7 @@
         mReader.showsCameraControls = NO;  // for UIImagePickerController
         mReader.showsZBarControls = NO;
         mReader.cameraOverlayView = mViewCamera.view;
-
+        mReader.cameraDevice = UIImagePickerControllerCameraDeviceFront;
     }
 
     
